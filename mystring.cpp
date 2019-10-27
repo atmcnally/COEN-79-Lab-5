@@ -43,21 +43,25 @@ string::~string() {
 
 void string::operator +=(const string& addend) {
 	//can use addend.characters
+
 }
 //Postcondition: addend has been catenated to the end of the string.
 
 void string::operator +=(const char addend[]) {
 	//can use addend.characters
+
 }
 //Precondition: addend is an ordinary null-terminated string.
 //Postcondition: addend has been catenated to the end of the string.
 
 void string::operator +=(char addend) {
 	//can use addend.characters
+
 }
 //Postcondition: The single character addend has been catenated to the end of the string.
 
 void string::reserve(size_t n) {
+	//only ever need to allocate more memory -- so this is done
 
 	if(current_length < n) {
 		char* tmp = new char[n];
@@ -71,10 +75,15 @@ void string::reserve(size_t n) {
 		characters = tmp;
 	}
 }
-//Postcondition: All functions will now work efficiently (without allocating new memory) until n characters are in the string.
+//Postcondition: All functions will now work efficiently (without allocating new memory) until n characters are in the string. 
 
 void string::insert(const string& source, unsigned int position) {
 	assert(position <= length());
+	reserve(current_length + source.length() + 1);
+	for (int i = current_length - 1; i >= position; i--) {
+		characters[i + 1] = characters[i];
+	}
+
 
 }
 //Postcondition: The source string is inserted into this string before the character at the given index.
@@ -100,6 +109,7 @@ size_t string::length() const {
 	size_t leng = 0;
 	//figure out length
 
+	current_length = leng;
 	return leng;
 }
 //     Postcondition: The return value is the number of characters in the string.
@@ -107,6 +117,7 @@ size_t string::length() const {
 char string::operator [ ](size_t position) const {
 	assert(position < length());
 
+	return 
 }
 //Postcondition: The value returned is the character at the specified position of the string. 
 //A string's positions start from 0 at the start of the sequence and go up to length( )-1 at the right end.
@@ -118,13 +129,31 @@ int string::search(char c) const {
 //If the string does not contain c, -1 is is returned.
 
 int string::search(const string& substring) const {
+	for (int i = 0; i < current_length - substring.length(); i++) {
+		if (characters[i] == substring[0]) {
+			//if first character matches, check everything of substring length after character[i]
+			for (int j = 0; j < substring.length(); j++) {
+				if (characters[i + j] != substring.characters[j]) {
 
+				}
+			}
+		}
+	}
+
+	return -1;
 }
 //Postcondition: Returns the index of the start of the first instance of the given substring inside of this string. 
 //If the substring is not found, this function returns -1.
 
 unsigned int string::count(char c) const {
+	int count = 0;
+	for (int i = 0; i < current_length; i++) {
+		if (characters[i] == c) {
+			count++;
+		}
+	}
 
+	return count;
 }
 //Postcondition: The count of the occurence of the character c within this string is returned.
 
@@ -135,7 +164,17 @@ unsigned int string::count(char c) const {
 //forming a total order semantics, using the usual lexicographic order on strings.
 
 bool operator ==(const string& s1, const string& s2) {
+	if (s1.length() != s2.length()) {
+		return false;
+	} else {
+		for (int i = 0; i < s1.length(); i++) {
+			if (s1.characters[i] != s2.characters[i]) {
+				return false;
+			}
+		}
+	}
 
+	return true;
 }
 
 bool operator !=(const string& s1, const string& s2) {
