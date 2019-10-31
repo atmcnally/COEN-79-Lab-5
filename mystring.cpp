@@ -43,20 +43,33 @@ string::~string() {
 
 void string::operator +=(const string& addend) {
 	//can use addend.characters
+	reserve(current_length + addend.length());
+	for (int i = 0; i < addend.length(); i++) {
+		characters[current_length + i] = addend[i];
+	}
 
+	current_length += addend.length();
 }
 //Postcondition: addend has been catenated to the end of the string.
 
 void string::operator +=(const char addend[]) {
 	//can use addend.characters
+	reserve(current_length + sizeof(addend);
 
+	for (int i = 0; i < sizeof(addend); i++) {
+		characters[current_length + i] = addend[i];
+	}
+
+	current_length += sizeof(addend);
 }
 //Precondition: addend is an ordinary null-terminated string.
 //Postcondition: addend has been catenated to the end of the string.
 
 void string::operator +=(char addend) {
 	//can use addend.characters
-
+	reserve(current_length + 1);
+	characters[current_length] = addent;
+	current_length++;
 }
 //Postcondition: The single character addend has been catenated to the end of the string.
 
@@ -80,62 +93,82 @@ void string::reserve(size_t n) {
 void string::insert(const string& source, unsigned int position) {
 	assert(position <= length());
 	reserve(current_length + source.length() + 1);
+	int count = 0;
 	for (int i = current_length - 1; i >= position; i--) {
 		characters[i + 1] = characters[i];
+		characters[i] = source[count];
+		count++;
 	}
 
-
+	current_length += source.length();
 }
 //Postcondition: The source string is inserted into this string before the character at the given index.
 
 void string::dlt(unsigned int position, unsigned int num) {
 	assert((position + num) <= length());
+	for (int i = 0; i < num; i++) {
+		characters[position + i] = characters[position + num + i];
+	}
 
+	for (int i = position + num; i < position + 2 * num; i++) {
+		characters[i] = '/0';
+	}
+
+	//this does not mean that the allocated amount is still near current_length -- a lot of extra might end up getting allocated
+	current_length -= num;
 }
 //Postcondition: num characters are deleted from the sequence, starting at index position.
 
 void string::replace(char c, unsigned int position) {
 	assert(position < length());
-
+	characters[position] = c;
 }
 //Postcondtion: the character at the given position in the string is replaced with c.
 
 void string::replace(const string& source, unsigned int position) {
 	assert((position + source.length()) <= length());
+	for (int i = 0; i < source.length(); i++) {
+		characters[position + i] = source[i];
+	}
 }
 //Postcondtion: the characters in this string starting at position are replaced with those in the source srting.
-
-size_t string::length() const {
-	size_t leng = 0;
-	//figure out length
-
-	current_length = leng;
-	return leng;
-}
-//     Postcondition: The return value is the number of characters in the string.
 
 char string::operator [ ](size_t position) const {
 	assert(position < length());
 
-	return 
+	return characters[position];
 }
 //Postcondition: The value returned is the character at the specified position of the string. 
 //A string's positions start from 0 at the start of the sequence and go up to length( )-1 at the right end.
 
 int string::search(char c) const {
+	for (int i = 0; i < current_length; i++) {
+		if (characters[i] == c) {
+			return i;
+		}
+	}
 
+	return -1;
 }
 //Postcondition: The location of the first occurence of the character c within this string is returned. 
 //If the string does not contain c, -1 is is returned.
 
 int string::search(const string& substring) const {
+	bool pop = true;
 	for (int i = 0; i < current_length - substring.length(); i++) {
 		if (characters[i] == substring[0]) {
 			//if first character matches, check everything of substring length after character[i]
 			for (int j = 0; j < substring.length(); j++) {
-				if (characters[i + j] != substring.characters[j]) {
-
+				if (characters[i + j] == substring.characters[j]) {
+					continue;
+				} else {
+					pop = false;
+					break;
 				}
+			}
+
+			if (pop) {
+				return i;
 			}
 		}
 	}
@@ -164,7 +197,7 @@ unsigned int string::count(char c) const {
 //forming a total order semantics, using the usual lexicographic order on strings.
 
 bool operator ==(const string& s1, const string& s2) {
-	if (s1.length() != s2.length()) {
+	/* if (s1.length() != s2.length()) {
 		return false;
 	} else {
 		for (int i = 0; i < s1.length(); i++) {
@@ -172,13 +205,22 @@ bool operator ==(const string& s1, const string& s2) {
 				return false;
 			}
 		}
+	} */
+	if (s1.length() == s2.length()) {
+		if (strncmp(s1, s2, s1.length()) == 0) {
+			return true;
+		}
 	}
-
-	return true;
+	
+	return false;
 }
 
 bool operator !=(const string& s1, const string& s2) {
+	if (s1 == s2) {
+		return false;
+	}
 
+	return true;
 }
 
 bool operator > (const string& s1, const string& s2) {
@@ -190,29 +232,64 @@ bool operator < (const string& s1, const string& s2) {
 }
 
 bool operator >=(const string& s1, const string& s2) {
+	if (s1 == s2) {
+		return true;
+	} else {
+		if (s1.length() > s2.length()) {
+			return true;
+		} else if (s1.length == s2.length) {
+			//need to compare and evaluate result of strncmp
 
+		}
+	}
+
+	return false;
 }
 bool operator <=(const string& s1, const string& s2) {
+	if (s1 == s1) {
+		return true;
+	} else {
+		if (s1.length() < s2.length()) {
+			return true;
+		} else if (s1.length() == s2.length()) {
 
+		}
+	}
+
+	return false;
 }
 
 ostream& operator <<(ostream& outs, const string& source) {
 
+	for (int i = 0; i < source.length(); i++) {
+		outs << source.characters[i];
+	}
+
+	return outs;
 }
 //Postcondition: The sequence of characters in source has been written to outs. The return value is the ostream outs.
 
 // NON-MEMBER FUNCTIONS for the string class:
 string operator +(const string& s1, const string& s2) {
+	s1 += s2;
 
+	return s1;
 }
 //Postcondition: The string returned is the catenation of s1 and s2.
 
 string operator +(const string& s1, const char addend[]) {
-
+	reserve(s1.length() + sizeof(addend));
+	for (int i = 0; i < sizeof(addend); i++) {
+		s1.characters[s1.length() + i] = addend[i];
+	}
+	
+	return s1;
 }
 
 istream& operator >>(istream& ins, string& target) {
 
+
+	return ins;
 }
 //Postcondition: A string has been read from the istream ins, and the istream ins is then returned by the function. 
 //The reading operation skips white space (i.e., blanks, newlines, tabs) at the start of ins. 
